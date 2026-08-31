@@ -1,10 +1,17 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Activity, ArrowDown, ArrowRight, Bot, Check, Cloud, Code2, Copy, Cpu, Gauge, Play, RadioTower, RefreshCw, Send, TerminalSquare, UploadCloud } from 'lucide-react';
+import { Activity, ArrowDown, ArrowRight, Bot, Check, Cloud, Code2, Copy, Cpu, ExternalLink, Gauge, GitBranch, Play, RadioTower, RefreshCw, Send, TerminalSquare, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const practicePrompt = `你正在一个搭载利尔达 AI 云模组/AI 云卡的设备项目中工作。请使用项目内可用的端侧 SDK Skill，自主完成“人感夜灯 + 状态上报”最佳实践。
+const sdkRepositoryUrl = 'https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general';
+const sdkCloneCommand = 'git clone https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general.git AIoT_BX1_CX1_SDK_General';
+
+const practicePrompt = `你正在利尔达 BX1/CX1 AIoT SDK 工程中工作。SDK 仓库：${sdkRepositoryUrl}
+
+首先确认当前目录包含 code/standalone/freertos/；若尚未获取工程，请指导用户从上述公开仓库克隆或下载，不要臆造其他地址。当前 SDK 仅支持 Linux 编译，推荐 Ubuntu 20.04/22.04。
+
+请使用项目内可用的端侧 SDK Skill，自主完成“人感夜灯 + 状态上报”最佳实践。
 
 目标：
 1. PIR 检测到有人且处于夜间时，将灯光调为 40% 暖光；连续 60 秒无人则关灯。
@@ -14,8 +21,9 @@ const practicePrompt = `你正在一个搭载利尔达 AI 云模组/AI 云卡的
 
 执行要求：
 - 先读取工程、SDK 文档和已安装 Skill，说明计划与验收标准。
+- 应用代码优先放在 code/standalone/freertos/apps/，可复用 code/standalone/freertos/apps/aiot_app/ 的网络、日志、设备控制与 OTA 能力；硬件差异通过 BSP/Board 层隔离。
 - 修改真实工程并运行已有测试；必要时补充最小测试。
-- 编译固件；若检测到本地设备，优先本地烧录，否则准备 OTA 包。
+- 从 code/standalone/freertos/Boards/ecr6600/standalone 进入构建流程，编译固件；若检测到本地设备，优先调用 Skill 完成本地烧录，否则生成可追溯的 OTA 包。
 - 在真实设备或硬件模拟器上验证：有人亮灯、无人关灯、状态上报、云端指令四条链路。
 - 若日志或物理数据表明未通过，继续定位、修改、编译与验证，直到满足验收标准。
 - 最后给出修改摘要、验证证据、固件产物位置和可回滚说明。
@@ -39,6 +47,7 @@ const loopSteps = [
 export default function Home() {
   const [projectPath, setProjectPath] = useState('');
   const [copied, setCopied] = useState(false);
+  const [repoCopied, setRepoCopied] = useState(false);
   const codexUrl = useMemo(() => {
     const params = new URLSearchParams({ prompt: practicePrompt });
     if (projectPath.trim()) params.set('path', projectPath.trim());
@@ -50,6 +59,12 @@ export default function Home() {
     await navigator.clipboard.writeText(practicePrompt);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
+  }
+
+  async function copyRepository() {
+    await navigator.clipboard.writeText(sdkCloneCommand);
+    setRepoCopied(true);
+    window.setTimeout(() => setRepoCopied(false), 1800);
   }
 
   function openCodex() {
@@ -159,12 +174,18 @@ export default function Home() {
           <span className="section-kicker">QUICK START / 约 15 分钟</span><h2>最佳实践：人感夜灯 + 状态上报</h2>
           <p>一个小用例，跑通自然语言需求、端侧开发、IoT 上报、云端指令、烧录或 OTA，以及设备端验证的完整闭环。</p>
           <ul><li><Check /> PIR 检测与本地灯光控制</li><li><Check /> 属性、状态、日志统一上报</li><li><Check /> 云端配置与 OTA 下发</li><li><Check /> AI 根据物理数据继续自调试</li></ul>
+          <div className="sdk-facts"><span>BX1 / CX1</span><span>FreeRTOS</span><span>Linux Build</span><span>Local Flash / OTA</span></div>
         </div>
         <div className="launch-card">
           <div className="launch-head"><div><span>CODEX TASK</span><h3>把用例交给本地 Codex</h3></div><Code2 /></div>
+          <div className="start-step"><span>01</span><div><b>获取 BX1/CX1 SDK</b><small>公开 GitLab · main 分支</small></div></div>
+          <div className="repository-box"><GitBranch /><code>AI/aiot_bx1_cx1_sdk_general</code><a href={sdkRepositoryUrl} target="_blank" rel="noreferrer" aria-label="打开 SDK 仓库"><ExternalLink /></a></div>
+          <div className="repo-actions"><a href={sdkRepositoryUrl} target="_blank" rel="noreferrer">打开 SDK 仓库 <ArrowRight /></a><button onClick={copyRepository}><Copy /> {repoCopied ? '克隆命令已复制' : '复制克隆命令'}</button></div>
+          <div className="start-step path-step"><span>02</span><div><b>选择本地工程</b><small>已获取工程时可直接定位</small></div></div>
           <label htmlFor="projectPath">本地项目目录 <small>可选</small></label>
           <input id="projectPath" value={projectPath} onChange={(event) => setProjectPath(event.target.value)} placeholder="C:\workspace\ai-device-demo" />
           <p className="field-help">填写后，Codex 会在该项目中创建新任务；留空则先打开新任务，再选择项目。</p>
+          <div className="start-step run-step"><span>03</span><div><b>自然语言完成需求</b><small>修改 · 编译 · 烧录 / OTA · 端测</small></div></div>
           <Button className="launch-button" onClick={openCodex}><Play /> 唤起 Codex 并开始开发</Button>
           <button id="fallback" className="copy-button" onClick={copyPrompt}><Copy /> {copied ? '任务已复制' : '无法唤起？复制完整任务'}</button>
           <div className="launch-note"><span className="status-dot" /> 需要本机已安装 Codex 桌面应用</div>
