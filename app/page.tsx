@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 
 const sdkRepositoryUrl = 'https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general';
 const sdkCloneCommand = 'git clone https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general.git AIoT_BX1_CX1_SDK_General';
+const assetBase = import.meta.env.BASE_URL || '/';
 
 const practicePrompt = `你正在利尔达 BX1/CX1 AIoT SDK 工程中工作。SDK 仓库：${sdkRepositoryUrl}
 
@@ -137,8 +138,8 @@ export default function Home() {
             <div className="hardware-tags"><span>音频 I/O</span><span>设备控制</span><span>统一 SDK</span><span>日志回流</span></div>
           </div>
           <div className="product-stack">
-            <figure className="product-card product-wifi"><figcaption><b>Wi‑Fi</b><span>局域网 / 固定场景</span></figcaption><img src="/ai-card-wifi.png" alt="利尔达 Wi-Fi 版 AI 云卡正面" /></figure>
-            <figure className="product-card product-cat"><figcaption><b>CAT.1</b><span>蜂窝网络 / 独立联网</span></figcaption><img src="/ai-card-cat1.png" alt="利尔达 CAT.1 版 AI 云卡正面" /></figure>
+            <figure className="product-card product-wifi"><figcaption><b>Wi‑Fi</b><span>局域网 / 固定场景</span></figcaption><img src={`${assetBase}ai-card-wifi.png`} alt="利尔达 Wi-Fi 版 AI 云卡正面" /></figure>
+            <figure className="product-card product-cat"><figcaption><b>CAT.1</b><span>蜂窝网络 / 独立联网</span></figcaption><img src={`${assetBase}ai-card-cat1.png`} alt="利尔达 CAT.1 版 AI 云卡正面" /></figure>
           </div>
         </div>
       </section>
