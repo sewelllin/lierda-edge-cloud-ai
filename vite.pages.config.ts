@@ -8,7 +8,7 @@ const projectRoot = fileURLToPath(new URL('.', import.meta.url));
 
 export default defineConfig({
   base: '/lierda-edge-cloud-ai/',
-  root: 'pages',
+  root: 'github-pages',
   publicDir: resolve(projectRoot, 'public'),
   build: {
     outDir: resolve(projectRoot, 'dist-pages'),

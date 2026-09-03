@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 
 const sdkRepositoryUrl = 'https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general';
 const sdkCloneCommand = 'git clone https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general.git AIoT_BX1_CX1_SDK_General';
-const assetBase = import.meta.env.BASE_URL || '/';
 
 const practicePrompt = `你正在利尔达 BX1/CX1 AIoT SDK 工程中工作。SDK 仓库：${sdkRepositoryUrl}
 
@@ -76,14 +75,14 @@ export default function Home() {
   return (
     <main>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="利尔达端云AI首页"><span className="brand-mark">Li</span><span>Lierda</span></a>
+        <a className="brand site-title" href="#top" aria-label="端云AI集成开发模式体验首页">端云AI集成开发模式体验</a>
         <nav aria-label="主导航"><a href="#architecture">技术架构</a><a href="#quickstart">快速开始</a></nav>
         <a className="header-cta" href="#quickstart">运行最佳实践 <ArrowRight /></a>
       </header>
 
       <section id="top" className="hero section-shell">
         <div className="hero-copy">
-          <div className="eyebrow"><span /> 端 · 云 · AI 一体化开发</div>
+          <div className="eyebrow"><span /> 端 · 云 · AI 集成开发</div>
           <h1>让 AI 不只写代码，<br /><em>更把需求跑到设备上。</em></h1>
           <p>一个端侧 SDK、一条轻量连接、一套 AIoT 平台。自然语言需求经由 Skill 进入真实工程，完成编译、烧录或 OTA，并用设备日志与物理数据自主验证。</p>
           <div className="hero-actions">
@@ -138,8 +137,8 @@ export default function Home() {
             <div className="hardware-tags"><span>音频 I/O</span><span>设备控制</span><span>统一 SDK</span><span>日志回流</span></div>
           </div>
           <div className="product-stack">
-            <figure className="product-card product-wifi"><figcaption><b>Wi‑Fi</b><span>局域网 / 固定场景</span></figcaption><img src={`${assetBase}ai-card-wifi.png`} alt="利尔达 Wi-Fi 版 AI 云卡正面" /></figure>
-            <figure className="product-card product-cat"><figcaption><b>CAT.1</b><span>蜂窝网络 / 独立联网</span></figcaption><img src={`${assetBase}ai-card-cat1.png`} alt="利尔达 CAT.1 版 AI 云卡正面" /></figure>
+            <figure className="product-card product-wifi"><figcaption><b>Wi‑Fi</b><span>局域网 / 固定场景</span></figcaption><img src="./ai-card-wifi.png" alt="利尔达 Wi-Fi 版 AI 云卡正面" /></figure>
+            <figure className="product-card product-cat"><figcaption><b>CAT.1</b><span>蜂窝网络 / 独立联网</span></figcaption><img src="./ai-card-cat1.png" alt="利尔达 CAT.1 版 AI 云卡正面" /></figure>
           </div>
         </div>
       </section>
