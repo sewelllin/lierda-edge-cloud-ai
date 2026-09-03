@@ -7,28 +7,41 @@ import { Button } from '@/components/ui/button';
 const sdkRepositoryUrl = 'https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general';
 const sdkCloneCommand = 'git clone https://sdk.lierda.com/AI/aiot_bx1_cx1_sdk_general.git AIoT_BX1_CX1_SDK_General';
 
-const practicePrompt = `你正在利尔达 BX1/CX1 AIoT SDK 工程中工作。SDK 仓库：${sdkRepositoryUrl}
+const practicePrompt = `你正在利尔达 BX1/CX1 AIoT SDK 工程中工作。
 
-首先确认当前目录包含 code/standalone/freertos/；若尚未获取工程，请指导用户从上述公开仓库克隆或下载，不要臆造其他地址。当前 SDK 仅支持 Linux 编译，推荐 Ubuntu 20.04/22.04。
+**任务**
 
-请使用项目内可用的端侧 SDK Skill，自主完成“人感夜灯 + 状态上报”最佳实践。
+实现“数字问答小游戏”，包括设备端固件和 Ubuntu PySide6 上位机。
 
-目标：
-1. PIR 检测到有人且处于夜间时，将灯光调为 40% 暖光；连续 60 秒无人则关灯。
-2. 每次占用状态和灯光状态变化，都通过统一端云链路上报平台。
-3. 支持平台下发开关、亮度、无人延时配置，并保留 OTA 升级能力。
-4. 将设备日志、传感器数据和动作结果回流，作为 AI 判断是否达标的依据。
+上位机随机设置 0～999 的目标数字，设备使用原唤醒词接收语音并上传云端识别，将识别文字通过串口发送至上位机。上位机提取数字并判断答案，再将结果发送回设备，由外部音频芯片和喇叭播放“回答正确”或“回答错误”，随后自动进入下一题。
 
-执行要求：
-- 先读取工程、SDK 文档和已安装 Skill，说明计划与验收标准。
-- 应用代码优先放在 code/standalone/freertos/apps/，可复用 code/standalone/freertos/apps/aiot_app/ 的网络、日志、设备控制与 OTA 能力；硬件差异通过 BSP/Board 层隔离。
-- 修改真实工程并运行已有测试；必要时补充最小测试。
-- 从 code/standalone/freertos/Boards/ecr6600/standalone 进入构建流程，编译固件；若检测到本地设备，优先调用 Skill 完成本地烧录，否则生成可追溯的 OTA 包。
-- 在真实设备或硬件模拟器上验证：有人亮灯、无人关灯、状态上报、云端指令四条链路。
-- 若日志或物理数据表明未通过，继续定位、修改、编译与验证，直到满足验收标准。
-- 最后给出修改摘要、验证证据、固件产物位置和可回滚说明。
+**任务需求**
 
-不要臆造工具名称或测试结果；遇到需要用户确认的硬件操作时，明确请求确认。`;
+- 上位机提供串口选择、连接、断开和重新检测功能；设备负责上传 ASR 结果和喇叭播放。
+- 界面显示：游戏状态（未开始、进行中、结束）、ASR 结果、解析数字、判断结果（回答正确/回答错误）、回答正确题数、当前答题总数。
+- 点击“开始游戏”后，检查并显示设备就绪状态；上位机随机生成目标数字并以大号字体突出显示，同时清零回答正确题数和当前答题总数。
+- 必须确保唤醒后立即说话能够可靠上传，唤醒事件不得丢失。
+- 上位机仅判断 ASR 最终结果，避免 ASR 中间结果触发多次判断。
+- 支持中文答题，例如“一百二十三”“五八九”“答案是五百一十六”“结果是六七一”等表述。
+- “回答正确/回答错误”的 OPUS 帧传到外部音频芯片；确保每一个独立 OPUS packet 的字节数小于允许的最大值。
+- 小游戏期间完全禁止云端 TTS 播放，只允许播放“回答正确”或“回答错误”。
+- 完成任务后使用 venv 安装所需依赖。
+- README.md 必须包括：游戏说明、venv 创建与依赖安装、上位机运行方式、固件构建方式、串口参数和硬件连接。
+
+**执行要求**
+
+- 默认工作目录为 ~/lierda/quick_start，开始前主动询问用户是否需要指定其他工作目录。
+- 检查工作目录是否存在；若不存在则创建。
+- 确认工作目录中是否包含利尔达 BX1/CX1 AIoT SDK 工程：aiot_bx1_cx1_sdk_general/code/standalone/freertos/。
+- 若尚未获取工程，从公开仓库克隆：${sdkRepositoryUrl}。
+- 先阅读 SDK 文档、现有工程和可用 Skill，给出实施计划与验收标准。
+- 修改真实工程，完成设备端固件、PySide6 上位机、串口协议、中文数字解析和音频反馈链路。
+- 运行可用测试并补充必要的最小测试，重点验证最终 ASR 去重、中文数字解析、OPUS packet 大小和游戏状态切换。
+- 编译固件，并在得到用户确认后通过本地烧录或 OTA 更新设备。
+- 联调真实设备或硬件模拟器，结合模组日志、串口数据和上位机状态验证完整流程；未通过则继续修改、编译和验证。
+- 最后提供修改摘要、运行步骤、测试证据、固件产物位置及可回滚说明。
+
+不要臆造工具名称、设备状态或测试结果；涉及烧录、OTA、串口占用等硬件操作时，按需请求用户确认。`;
 
 const architecture = [
   { icon: Cpu, label: '设备端', detail: 'AI 云模组 / 云卡 · 统一 SDK' },
@@ -171,21 +184,21 @@ export default function Home() {
 
       <section id="quickstart" className="quickstart section-shell">
         <div className="quick-copy">
-          <span className="section-kicker">QUICK START / 约 15 分钟</span><h2>最佳实践：人感夜灯 + 状态上报</h2>
-          <p>一个小用例，跑通自然语言需求、端侧开发、IoT 上报、云端指令、烧录或 OTA，以及设备端验证的完整闭环。</p>
-          <ul><li><Check /> PIR 检测与本地灯光控制</li><li><Check /> 属性、状态、日志统一上报</li><li><Check /> 云端配置与 OTA 下发</li><li><Check /> AI 根据物理数据继续自调试</li></ul>
-          <div className="sdk-facts"><span>BX1 / CX1</span><span>FreeRTOS</span><span>Linux Build</span><span>Local Flash / OTA</span></div>
+          <span className="section-kicker">QUICK START / DEVICE + DESKTOP</span><h2>最佳实践：数字问答小游戏</h2>
+          <p>上位机随机出题，设备语音作答。AI 同时完成设备端固件、Ubuntu PySide6 上位机和串口联调，把需求推进到真实设备效果。</p>
+          <ul><li><Check /> 0～999 随机数字出题</li><li><Check /> 最终 ASR 与中文数字解析</li><li><Check /> PySide6 串口上位机</li><li><Check /> OPUS 正误反馈与端测</li></ul>
+          <div className="sdk-facts"><span>BX1 / CX1</span><span>PySide6</span><span>SERIAL</span><span>OPUS</span></div>
         </div>
         <div className="launch-card">
           <div className="launch-head"><div><span>CODEX TASK</span><h3>把用例交给本地 Codex</h3></div><Code2 /></div>
           <div className="start-step"><span>01</span><div><b>获取 BX1/CX1 SDK</b><small>公开 GitLab · main 分支</small></div></div>
           <div className="repository-box"><GitBranch /><code>AI/aiot_bx1_cx1_sdk_general</code><a href={sdkRepositoryUrl} target="_blank" rel="noreferrer" aria-label="打开 SDK 仓库"><ExternalLink /></a></div>
           <div className="repo-actions"><a href={sdkRepositoryUrl} target="_blank" rel="noreferrer">打开 SDK 仓库 <ArrowRight /></a><button onClick={copyRepository}><Copy /> {repoCopied ? '克隆命令已复制' : '复制克隆命令'}</button></div>
-          <div className="start-step path-step"><span>02</span><div><b>选择本地工程</b><small>已获取工程时可直接定位</small></div></div>
-          <label htmlFor="projectPath">本地项目目录 <small>可选</small></label>
-          <input id="projectPath" value={projectPath} onChange={(event) => setProjectPath(event.target.value)} placeholder="C:\workspace\ai-device-demo" />
-          <p className="field-help">填写后，Codex 会在该项目中创建新任务；留空则先打开新任务，再选择项目。</p>
-          <div className="start-step run-step"><span>03</span><div><b>自然语言完成需求</b><small>修改 · 编译 · 烧录 / OTA · 端测</small></div></div>
+          <div className="start-step path-step"><span>02</span><div><b>准备工作目录</b><small>默认 ~/lierda/quick_start</small></div></div>
+          <label htmlFor="projectPath">指定其他工作目录 <small>可选</small></label>
+          <input id="projectPath" value={projectPath} onChange={(event) => setProjectPath(event.target.value)} placeholder="~/lierda/quick_start" />
+          <p className="field-help">留空时 Codex 会先询问是否采用默认目录，并在目录不存在时创建；填写后则直接定位到指定目录。</p>
+          <div className="start-step run-step"><span>03</span><div><b>自然语言完成小游戏</b><small>固件 + 上位机 · 串口联调 · 烧录 / OTA · 端测</small></div></div>
           <Button className="launch-button" onClick={openCodex}><Play /> 唤起 Codex 并开始开发</Button>
           <button id="fallback" className="copy-button" onClick={copyPrompt}><Copy /> {copied ? '任务已复制' : '无法唤起？复制完整任务'}</button>
           <div className="launch-note"><span className="status-dot" /> 需要本机已安装 Codex 桌面应用</div>
